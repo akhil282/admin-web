@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "888315519906",
+    "project_id": "cater-management",
+    "storage_bucket": "cater-management.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:888315519906:android:97f8123488c9368c56c8fb",
+        "android_client_info": {
+          "package_name": "com.example.cater_admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALc6qbDR1LsKuIeFQbDQ-hcewbytlVIso"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
