@@ -17,7 +17,7 @@ showAppSnackBar({
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: bgColor,
       colorText: Colors.white,
-      duration: Duration(seconds: 3),
+      duration: Duration(milliseconds: 500),
       borderRadius: 10,
       margin: EdgeInsets.all(10),
     );
@@ -35,7 +35,7 @@ showAppSnackBar({
           behavior: SnackBarBehavior.floating,
           margin: EdgeInsets.all(10),
           action: SnackBarAction(label: title, onPressed: () {}),
-          duration: Duration(seconds: 3),
+          duration: Duration(milliseconds: 500),
           dismissDirection: DismissDirection.horizontal,
         ),
       );

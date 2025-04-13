@@ -93,18 +93,29 @@ showPl(context);
               color: themeColor.black,
             
           ),),
-          trailing: StreamBuilder(stream: getEmpReportBloc.empReportStream, builder: (context, snapshot) {
-           if(snapshot.hasData){
-             return snapshot.data!.isNotEmpty? iconButton(icon: Icons.download, onPressed: (){
-            showPl(context);
-            generatePDF(allData: getEmpReportBloc.allData,empId: widget.employeeData['empId'].toString());
-      hidePl();
-          }, color: themeColor.mint,):null;
-           }else {
+    trailing: StreamBuilder(
+  stream: getEmpReportBloc.empReportStream,
+  builder: (context, snapshot) {
+    if (snapshot.hasData) {
+      return snapshot.data!.isNotEmpty
+          ? IconButton(
+              icon: Icon(Icons.download, color: themeColor.mint),
+              onPressed: () {
+                showPl(context);
+                generatePDF(
+                  allData: getEmpReportBloc.allData,
+                  empId: widget.employeeData['empId'].toString(),
+                );
+                hidePl();
+              },
+            )
+          : SizedBox.shrink(); 
+    } else {
+      return SizedBox.shrink(); 
+    }
+  },
+),
 
-             return SizedBox();
-           }
-          },),
           
         ),
         backgroundColor: themeColor.mint,
@@ -150,7 +161,7 @@ showPl(context);
                                               employeeId: widget.employeeData['empId'].toString(),);
                   setState(() {
                   });
-                }),
+                },),
                 SizedBox(height: width < 600 ? 8 : 16),
                 Expanded(
                   child: StreamBuilder<List<dynamic>>(

@@ -1,15 +1,23 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
+import 'package:cater_admin_web/components/firebase_collection.dart';
+import 'package:cater_admin_web/components/loader.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:excel/excel.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:intl/intl.dart';
 import 'dart:html' as html;
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:excel/excel.dart' as exc;
+
+
 
 String formatDateKey(DateTime date) {
   return DateFormat("ddMMyyyy").format(date);
@@ -121,8 +129,135 @@ Future<void> generatePDF({required List<dynamic> allData,required String empId})
   }
 
     int _getTotal({required String type,required List<dynamic> allData}) {
+
+
+
+
     return allData.fold(0, (sum, e) {
       int index = type == "tea" ? 0 : type == "lunch" ? 1 : 2;
       return sum + ((e['orderList'][0]['foodInfo'][index]['count'] ?? 0) as int);
     });
   }
+
+
+
+Future<void> pickLoadAndUploadExcel({required BuildContext context}) async {
+  showPl(context);
+  try {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx', 'xls'],
+    );
+
+    if (result != null) {
+      Uint8List? fileBytes = result.files.single.bytes; // Web, iOS, Android
+      String? filePath = result.files.single.path; // Windows, Android
+
+      Uint8List? excelBytes;
+      if (fileBytes != null) {
+        excelBytes = fileBytes;
+      } else if (filePath != null) {
+        excelBytes = await File(filePath).readAsBytes();
+      }
+
+      if (excelBytes != null) {
+        var excel = Excel.decodeBytes(excelBytes);
+
+        // Assuming data is in the first sheet
+        var sheet = excel.tables.keys.first;
+        var rows = excel.tables[sheet]?.rows ?? [];
+
+        if (rows.isEmpty) {
+          print('No data found in the Excel file.');
+          return;
+        }
+
+        List<Map<String, dynamic>> parsedData = [];
+
+        // Skip the first row (headers) and process from second row
+        for (int i = 1; i < rows.length; i++) {
+          var row = rows[i];
+          var rowData = {
+            'userName': row[0]?.value.toString() ?? '',
+            'empId': row[1]?.value.toString() ?? '',
+            'password': row[2]?.value.toString() ?? '',
+            'department': row[3]?.value.toString() ?? '',
+            'tea': row[4]?.value.toString() == 'true',
+            'isActive': true
+          };
+          parsedData.add(rowData);
+        }
+
+        print('Parsed Data: ${jsonEncode(parsedData)}');
+
+        // Uploading to Firestore
+        List<String> existingEmpIds = [];
+        final CollectionReference employeeCollection =
+            FirebaseFirestore.instance.collection(FirebaseString.newTempEmployeeCollection);
+
+        for (var data in parsedData) {
+          String empId = data['empId'];
+          if (empId.isNotEmpty) {
+            var docRef = employeeCollection.doc(empId);
+            var docSnapshot = await docRef.get();
+
+            if (docSnapshot.exists) {
+              existingEmpIds.add(empId);
+            } else {
+              await docRef.set(data);
+            }
+          }
+        }
+
+        if (existingEmpIds.isNotEmpty) {
+          print('The following empIds already exist in the collection: $existingEmpIds');
+        } else {
+          print('All data successfully uploaded to Firestore.');
+        }
+      }
+    }
+  } catch (e) {
+    print('Error: $e');
+  } finally {
+    hidePl();
+  }
+}
+
+
+
+
+
+Future<void> downloadFormExcelForBulk() async {
+  try {
+    // Create an Excel file
+    final Excel excel = Excel.createExcel();
+    final Sheet sheet = excel['Sheet1'];
+
+    // Add header row
+    sheet.appendRow([
+      TextCellValue('Username'),
+      TextCellValue('Employee Id'),
+      TextCellValue('Password'),
+      TextCellValue('Department'),
+      TextCellValue('Allow Tea'),
+    ]);
+
+    // Encode the Excel file
+    final List<int>? bytes = excel.encode();
+    if (bytes == null) throw Exception("Failed to encode Excel file");
+
+    final Uint8List byteData = Uint8List.fromList(bytes);
+
+    // Use FileSaver to save the file
+    await FileSaver.instance.saveFile(
+      name: "emp_form_format_${DateTime.now().millisecondsSinceEpoch}.xlsx",
+      bytes: byteData,
+      ext: "xlsx",
+      mimeType: MimeType.other,
+    );
+
+    print('Excel file successfully saved.');
+  } catch (e) {
+    print('Error saving Excel file: $e');
+  }
+}

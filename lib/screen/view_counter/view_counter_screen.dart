@@ -90,7 +90,7 @@ class _ViewCounterScreenState extends State<ViewCounterScreen> {
                     
                     
                       
-                    }),
+                    },),
                   ),
                 ],
               ),

@@ -6,6 +6,7 @@ import 'package:cater_admin_web/components/comman_toastnotification.dart';
 import 'package:cater_admin_web/components/comman_ui.dart';
 import 'package:cater_admin_web/components/firebase_collection.dart';
 import 'package:cater_admin_web/components/globle_value.dart';
+import 'package:cater_admin_web/components/loader.dart';
 import 'package:cater_admin_web/components/responsive_builder.dart';
 import 'package:cater_admin_web/components/text_comman.dart';
 import 'package:cater_admin_web/components/theme_color.dart';
@@ -141,6 +142,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                   value: employeeData['isActive'] ?? false,
                   onChanged: (value) async {
+                    employee.reference.update({
+                      'isActive': value,
+                    });
+                    setState(() {
+                      
+                    });
                     await dashBoardController!.updateEmployeeStatus(
                       docId: employee.id,
                       newValue: value,
@@ -161,10 +168,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 IconButton(
                   icon: Icon(Icons.delete_outline),
                   onPressed: () async {
-                    await dashBoardController!.deleteEmployee(
-                      docId: employee.id,
-                      context: context,
-                    );
+                  await showPl(context);
+                 await dashBoardController!.deleteEmployee(
+                    docId: employee.id,
+                    context: context,
+                  );
                   },
                 ),
               ],
@@ -177,95 +185,94 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildTableView(List<QueryDocumentSnapshot> employeesTempList) {
     return Obx(() => Container(
-      width: max(772, getWidth(context, 100 - 32)), // Minimum width of 772px
-      child: Table(
-        columnWidths: {
-          0: FlexColumnWidth(2), // Employee Name
-          1: FlexColumnWidth(2), // Employee ID
-          2: FlexColumnWidth(2), // Department
-          3: FlexColumnWidth(1), // Status
-          4: FlexColumnWidth(1.5), // Actions
-        },
-        children: [
-          TableRow(
-            decoration: BoxDecoration(color: Colors.grey.shade100),
+      width: max(772, getWidth(context, 100-20)), // Minimum width of 772px
+      child: SingleChildScrollView( 
+        child: Table(
+          columnWidths: {
+            0: FlexColumnWidth(2), // Employee Name
+            1: FlexColumnWidth(2), // Employee ID
+            2: FlexColumnWidth(2), // Department
+            3: FlexColumnWidth(1), // Status
+            4: FlexColumnWidth(1.5), // Actions
+          },
+          children: [
+            TableRow(
+              decoration: BoxDecoration(color: themeColor.mint100),
+            
+              children: [
+                _buildHeaderCell('Employee Name'),
+                _buildHeaderCell('Employee ID'),
+                _buildHeaderCell('Department'),
+                _buildHeaderCell('Status'),
+                _buildHeaderCell('Actions'),
+              ],
+            ),
+            ...employeesTempList.where((employee) {
+        return employee['userName']
+        .toString()
+        .contains(searchValue.toString());
+            }).map((employee) {
+        print("final employee data:--------->${employee.data()}");
+        return TableRow(
             children: [
-              _buildHeaderCell('Employee Name'),
-              _buildHeaderCell('Employee ID'),
-              _buildHeaderCell('Department'),
-              _buildHeaderCell('Status'),
-              _buildHeaderCell('Actions'),
+        _buildTableCell(employee['userName'] ?? ''),
+        _buildTableCell(employee['empId'] ?? ''),
+        _buildTableCell(employee['department'] ?? ''),
+        _buildTableCell(
+          '',
+          child: Switch(
+            value: employee['isActive'] ?? false,
+            inactiveTrackColor: themeColor.white,
+            onChanged: (value) async {
+              employee.reference.update({
+                'isActive': value,
+              });
+              setState(() {
+              });
+          
+               dashBoardController!.updateEmployeeStatus(
+                docId: employee.id,
+                newValue: value,
+              );
+            
+            },
+            activeColor: themeColor.rubyGreen,
+          ),
+        ),
+        _buildTableCell(
+          '',
+          child: Row(
+            children: [
+              IconButton(
+                padding: EdgeInsets.all(4),
+                constraints: BoxConstraints(),
+                icon: Icon(
+                  Icons.edit_outlined,
+                  size: 18,
+                  color: themeColor.rubyGreen,
+                ),
+                onPressed: () async {
+                  await showEditDialog(context, employee);
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.delete, color: themeColor.rubyRed),
+                onPressed: () async {
+                 await showPl(context);
+                 await dashBoardController!.deleteEmployee(
+                    docId: employee.id,
+                    context: context,
+                  );
+                },
+              ),
             ],
           ),
-...employeesTempList.where((employee) {
-  return employee['userName']
-      .toString()
-      .contains(searchValue.toString());
-}).map((employee) {
-  print("final employee data:--------->${employee.data()}");
-  return TableRow(
-    children: [
-      _buildTableCell(employee['userName'] ?? ''),
-      _buildTableCell(employee['empId'] ?? ''),
-      _buildTableCell(employee['department'] ?? ''),
-      _buildTableCell(
-        '',
-        child: Switch(
-          value: employee['isActive'] ?? false,
-          inactiveTrackColor: themeColor.white,
-          onChanged: (value) async {
-            // Update the value in Firestore
-            await dashBoardController!.updateEmployeeStatus(
-              docId: employee.id,
-              newValue: value,
-            );
-
-            // Refresh the UI by re-fetching the data or updating the local list
-            setState(() {
-              final employeeData = dashBoardController!.employees
-                  .firstWhere((e) => e.id == employee.id)
-                  .data();
-              if (employeeData != null) {
-                (employeeData as Map<String, dynamic>)['isActive'] =
-                    value;
-              }
-            });
-          },
-          activeColor: themeColor.rubyGreen,
         ),
-      ),
-      _buildTableCell(
-        '',
-        child: Row(
-          children: [
-            IconButton(
-              padding: EdgeInsets.all(4),
-              constraints: BoxConstraints(),
-              icon: Icon(
-                Icons.edit_outlined,
-                size: 18,
-                color: themeColor.rubyGreen,
-              ),
-              onPressed: () async {
-                await showEditDialog(context, employee);
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.delete, color: themeColor.rubyRed),
-              onPressed: () {
-                dashBoardController!.deleteEmployee(
-                  docId: employee.id,
-                  context: context,
-                );
-              },
-            ),
+            ],
+        );
+            }).toList(),
           ],
         ),
-      ),
-    ],
-  );
-}).toList(),
-        ],
       ),
     )
  ,); }
@@ -436,6 +443,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 SizedBox(height: 24),
                 buildCommonColorButton(
                   onPressed: () async {
+                     showPl(context);
                     try {
                       await dashBoardController!.updateEmployee(
                         docId: employee.id,
@@ -455,6 +463,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       );
                     } catch (e) {
                       print("utdate time error:----------->$e");
+                      hidePl();
+                     
                       showAppSnackBar(
                         title: 'Error',
                         message: 'Failed to update employee',

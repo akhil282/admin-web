@@ -1,3 +1,4 @@
+import 'package:cater_admin_web/apis/helper.dart';
 import 'package:cater_admin_web/components/comman_button.dart';
 import 'package:cater_admin_web/components/comman_textfield.dart';
 import 'package:cater_admin_web/components/comman_toastnotification.dart';
@@ -78,9 +79,16 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            'Fill-Up Employee Details',
-            style: Theme.of(context).textTheme.headlineMedium,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Fill-Up Employee Details',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+              ),
+              IconButton(onPressed: downloadFormExcelForBulk, icon: Icon(Icons.download,color: themeColor.mint),)
+            ],
           ),
           SizedBox(height: getHeight(context, 5)),
           buildCommonTextField(
@@ -211,7 +219,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           ),
           SizedBox(height: getHeight(context, 2.5)),
           buildCommonColorButton(
-            onPressed: () {},
+            onPressed: (){
+              pickLoadAndUploadExcel(context: context);
+            },
+            
             text: "Bulk Upload",
             backgroundColor: themeColor.mint,
           ),

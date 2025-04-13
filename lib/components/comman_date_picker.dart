@@ -73,34 +73,39 @@ class _DatePickerFieldState extends State<DatePickerField> {
 
 
 
-
-
-
-//! multiple date picker
-
 class DateRangePickerField extends StatefulWidget {
   final Function(DateTimeRange) onDateSelected;
 
-  const DateRangePickerField({Key? key, required this.onDateSelected}) : super(key: key);
+  DateRangePickerField({Key? key, required this.onDateSelected}) : super(key: key);
 
   @override
   _DateRangePickerFieldState createState() => _DateRangePickerFieldState();
 }
 
 class _DateRangePickerFieldState extends State<DateRangePickerField> {
-  DateTimeRange? selectedRange = DateTimeRange(start: DateTime.now(), end: DateTime.now());
+  DateTimeRange? selectedRange;
 
   Future<void> pickDateRange() async {
+    DateTime lastAvailableDate = DateTime.now();
+
+    // Ensure initial range does not exceed lastDate
+    DateTime startRange = DateTime.now().subtract(Duration(days: 30));
+    if (startRange.isAfter(lastAvailableDate)) {
+      startRange = lastAvailableDate.subtract(Duration(days: 1));
+    }
+
     DateTimeRange? picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-      initialDateRange: selectedRange,
+      lastDate: lastAvailableDate, // Ensure last date is valid
+      initialDateRange: selectedRange ?? DateTimeRange(
+        start: lastAvailableDate.subtract(Duration(days: 7)),
+        end: lastAvailableDate,
+      ),
       helpText: "Select Date Range",
       cancelText: "CANCEL",
       confirmText: "SELECT",
       saveText: "SAVE",
-      
       errorFormatText: "Enter valid date range",
       errorInvalidText: "Enter date range in valid range",
       fieldStartHintText: "Start Date",
@@ -111,9 +116,9 @@ class _DateRangePickerFieldState extends State<DateRangePickerField> {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color:themeColor.white,
+              color: Colors.white,
             ),
-            width: 350, // Compact view
+            width: 350,
             child: child,
           ),
         );
@@ -129,7 +134,7 @@ class _DateRangePickerFieldState extends State<DateRangePickerField> {
   }
 
   String formatDate(DateTime date) {
-    return DateFormat("dd-MM-yyyy").format(date).toUpperCase(); // Convert to uppercase
+    return DateFormat("dd-MM-yyyy").format(date).toUpperCase();
   }
 
   @override
@@ -138,20 +143,20 @@ class _DateRangePickerFieldState extends State<DateRangePickerField> {
       onTap: pickDateRange,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        width: double.infinity, // Full width for better alignment
+        width: double.infinity,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center, // Center align
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.calendar_today, size: 20, color: Colors.grey),
             SizedBox(width: 8),
             Text(
               selectedRange == null
                   ? "Select Date Range"
-                  : "${formatDate(selectedRange!.start)}       TO       ${formatDate(selectedRange!.end)}",
+                  : "${formatDate(selectedRange!.start)}  TO  ${formatDate(selectedRange!.end)}",
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ],

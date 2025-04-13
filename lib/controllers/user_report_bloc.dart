@@ -9,7 +9,7 @@ class UserReportBloc {
   StreamController<List<QueryDocumentSnapshot>> userReportController = StreamController<List<QueryDocumentSnapshot>>.broadcast();
   Stream<List<QueryDocumentSnapshot>> get userReportStream => userReportController.stream;
     final CollectionReference userReportCollection =
-      FirebaseFirestore.instance.collection(FirebaseString.employeeCollection);
+      FirebaseFirestore.instance.collection(FirebaseString.newTempEmployeeCollection);
 
   List<QueryDocumentSnapshot> employees = [];
 

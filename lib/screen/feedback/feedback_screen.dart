@@ -129,23 +129,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, color: themeColor.rubyGreen),
-        SizedBox(height: 8),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: themeColor.rubyGreen,
-          ),
-        ),
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey)),
-      ],
-    );
-  }
 
   Widget _buildEmptyState() {
     return Column(
@@ -492,34 +475,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: feedbackBloc.feedbackStream,
         builder: (context, snapshot) {
-          // Add debug prints
-          print("StreamBuilder state: ${snapshot.connectionState}");
-          print("Has data: ${snapshot.hasData}");
-          print("Has error: ${snapshot.hasError}");
-          if (snapshot.hasError) print("Error: ${snapshot.error}");
-          if (snapshot.hasData) print("Data length: ${snapshot.data!.length}");
 
-          if (isLoading) {
-            return Center(child: CircularProgressIndicator( color: themeColor.mint,));
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, color: Colors.red, size: 48),
-                  SizedBox(height: 16),
-                  Text(
-                    'Error: ${snapshot.error}',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final feedbackList =
+          if(snapshot.hasData){
+               final feedbackList =
               (snapshot.data ?? []).where((feedback) {
                 DateTime feedbackTime = DateTime.fromMillisecondsSinceEpoch(
                   feedback['time'].seconds * 1000,
@@ -547,7 +505,30 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ),
             ],
           );
-        },
+      
+          }else   if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  SizedBox(height: 16),
+                  Text(
+                    'Error: ${snapshot.error}',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ],
+              ),
+            );
+          }else{
+                return Center(child: CircularProgressIndicator( color: themeColor.mint,));
+        
+
+          }
+
+        
+
+         },
       ),
     );
   }

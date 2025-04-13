@@ -1,5 +1,6 @@
 import 'package:cater_admin_web/components/comman_toastnotification.dart';
 import 'package:cater_admin_web/components/firebase_collection.dart';
+import 'package:cater_admin_web/components/loader.dart';
 import 'package:cater_admin_web/components/theme_color.dart';
 import 'package:cater_admin_web/screen/create_user/create_user_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -41,11 +42,14 @@ class DashboardController extends GetxController {
     required bool newValue,
   }) async {
     try {
-      await _firestore.collection('newTempEmployee').doc(docId).update({
-        'isActive': newValue,
-      });
 
-      await fetchEmployees(); // Refresh the list
+
+             FirebaseFirestore.instance
+          .collection(FirebaseString.newTempEmployeeCollection)
+          .doc(docId)
+          .update({'isActive': newValue});
+
+       fetchEmployees(); // Refresh the list
     } catch (e) {
       print('Error updating status: $e');
       Get.snackbar(
@@ -64,9 +68,10 @@ class DashboardController extends GetxController {
     required BuildContext context,
   }) async {
     try {
-      await _firestore.collection('newTempEmployee').doc(docId).delete();
+      await _firestore.collection(FirebaseString.newTempEmployeeCollection).doc(docId).delete();
 
-      await fetchEmployees(); // Refresh the list
+      await fetchEmployees(); 
+      hidePl();
 
       Get.snackbar(
         'Success',
@@ -143,7 +148,7 @@ class DashboardController extends GetxController {
       print('Update data: $updateData'); // Debug print
 
       await _firestore
-          .collection('newTempEmployee')
+          .collection(FirebaseString.newTempEmployeeCollection)
           .doc(docId)
           .update(updateData);
 
@@ -151,6 +156,8 @@ class DashboardController extends GetxController {
 
       // Refresh the employees list
       await fetchEmployees();
+
+      hidePl();
     } catch (e) {
       print('Error in updateEmployee: $e'); // Debug print
       throw e; // Rethrow to handle in UI
